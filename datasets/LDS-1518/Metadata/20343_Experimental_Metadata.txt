@@ -1,0 +1,41 @@
+HMS_Dataset_20343_Experimental_Metadata
+"Imaging=""Acquisition_Groups=""""Imaging_Acquisition_Group=1"
+Imaging_Channel_Count=2
+Imaging_Channel_Method=sequential
+"""""""""Imaging_Channels=""""""""""""""""Imaging_Channel=1"
+Imaging_Detector_Gain=
+Imaging_Dichroic_Filter=n/a
+"""""""""""""""""""""""""""""""""Imaging_Emission_Filter=410"
+"480"""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""Imaging_Excitation_Filter=360"
+"400"""""""""""""""""""""""""""""""""
+Imaging_Excitation_Power=n/a
+Imaging_Excitation_Wavelength=Xenon
+Imaging_Exposure_Time=variable
+Imaging_Marker_Antibodies=FALSE
+Imaging_Marker_Compounds=TRUE
+Imaging_Marker_Intrinsic=FALSE
+Imaging_Marker_Sample_Specification=Hoechst
+"Imaging_Method=Fluorescence"""""""""""""""""
+"""""""""""""""""Imaging_Channel=2"
+Imaging_Detector_Gain=
+Imaging_Dichroic_Filter=n/a
+"""""""""""""""""""""""""""""""""Imaging_Emission_Filter=650"
+"700"""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""Imaging_Excitation_Filter=620"
+"640"""""""""""""""""""""""""""""""""
+Imaging_Excitation_Power=n/a
+Imaging_Excitation_Wavelength=Xenon
+Imaging_Exposure_Time=variable
+Imaging_Marker_Antibodies=FALSE
+Imaging_Marker_Compounds=TRUE
+Imaging_Marker_Intrinsic=FALSE
+Imaging_Marker_Sample_Specification=LDR
+"Imaging_Method=Fluorescence"""""""""""""""""""""""""""""""
+Design_Group=Imaging_Blocking_Agent=n/a,Imaging_Fixative=4% formaldehyde,Imaging_Permeabilization_Agent=n/a,Imaging_Plate_Format=384 Well,Imaging_Replication_Count=4,Imaging_Replication_Type=isogenic,Imaging_Type=fixed
+Imaging_Acquisition_Group_Rounds=1
+Imaging_Control_Sample=FALSE
+Imaging_Fixation_Time_Point=72 hr
+Incubation_Group=Imaging_Incubator=FALSE,Imaging_Incubator_CO2=n/a,Imaging_Incubator_Humidity=n/a,Imaging_Incubator_O2=n/a,Imaging_Incubator_Temp=n/a
+Settings_Group=Imaging_Detector_Binning=2x2,Imaging_Detector_Bit_Depth=16,Imaging_Detector_Type=sCMOS,Imaging_Lens_Immersion_Type=air,Imaging_Lens_Numerical_Aperture=0.75,Imaging_Lens_Optical_Correction=,Imaging_Light_Source=Xenon,Imaging_Magnification=10,Imaging_Microscope_Type=3D,Imaging_Pixelsize=1.32 um,Imaging_Z_Dimension=1,Imaging_Z_Stepsize=n/a
+Time_Group=Imaging_Live=FALSE,Imaging_Time_Interval=n/a,Imaging_Total_Number=1,Imaging_Total_Time=n/a
