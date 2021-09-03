@@ -106,26 +106,26 @@ class dataset_space_matrix():
         x = address[0]
         y = address[1]
         print(self.datapool[x, y, :])
-    #返回一个优先值数据矩阵
-    def return_priority_of_datapools(self, target_vector):
-        dirs = record_target_counts(target_vector)
-        target_matrix = np.array(target_vector).reshape([len(self.Cell_Name_list), len(self.Drug_Name_list)])
-        the_scores_for_combintaions = np.zeros((self.datapool.shape[0], self.datapool.shape[1]))
-        for x in range(self.datapool.shape[0]):
-            for y in range(self.datapool.shape[1]):
-                #the_first_standard
-                the_finished_count = np.sum(np.array([1 if x else 0 for x in self.datapool[x, y, 1]]))
-                the_finished_score = the_finished_count/self.range_of_Concentration
-                #the_second_standard########################
-                # ##########################################
-                # ############感觉还是需要考虑一下这个
-                the_certainty_score = np.random.randint(0, 1)
-                ####还有一个别的函数的关联性没有考虑####
-                the_relationship_score = dirs[target_matrix[x, y]]
-                the_score_this_point = the_finished_score + the_certainty_score + the_relationship_score
-                the_scores_for_combintaions[x, y] = the_score_this_point
-                ####
-        return the_scores_for_combintaions
+    # #返回一个优先值数据矩阵
+    # def return_priority_of_datapools(self, target_vector):
+    #     dirs = record_target_counts(target_vector)
+    #     target_matrix = np.array(target_vector).reshape([len(self.Cell_Name_list), len(self.Drug_Name_list)])
+    #     the_scores_for_combintaions = np.zeros((self.datapool.shape[0], self.datapool.shape[1]))
+    #     for x in range(self.datapool.shape[0]):
+    #         for y in range(self.datapool.shape[1]):
+    #             #the_first_standard
+    #             the_finished_count = np.sum(np.array([1 if x else 0 for x in self.datapool[x, y, 1]]))
+    #             the_finished_score = the_finished_count/self.range_of_Concentration
+    #             #the_second_standard########################
+    #             # ##########################################
+    #             # ############感觉还是需要考虑一下这个
+    #             the_certainty_score = np.random.randint(0, 1)
+    #             ####还有一个别的函数的关联性没有考虑####
+    #             the_relationship_score = dirs[target_matrix[x, y]]
+    #             the_score_this_point = the_finished_score + the_certainty_score + the_relationship_score
+    #             the_scores_for_combintaions[x, y] = the_score_this_point
+    #             ####
+    #     return the_scores_for_combintaions
     #选择这一轮选出的点
     def choose_the_data_for_this_round(self, target_vector, threshold=35):
         priority_matrix = self.return_priority_of_datapools(target_vector)
@@ -789,6 +789,10 @@ if __name__ == "__main__":
     plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='red', alpha=0.2)
     plt.plot([j for j in range(len(m3))], m3, "purple")
     plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
+    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
+    plt.xlabel("num-of-epochs")
+    plt.ylabel("MSE")
+    plt.title("cross-validation")
     plt.show()
 
 

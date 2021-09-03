@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # plt.plot(x, output, "blue", label='yaht')
     # plt.scatter(inputs, result)
     plt.title("sorted 1D function")
-
+    plt.show()
     # fig = plt.figure()
     # ##
     #

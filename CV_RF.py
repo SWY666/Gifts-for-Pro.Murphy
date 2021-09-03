@@ -897,11 +897,15 @@ if __name__ == "__main__":
     plt.plot([j for j in range(len(m1))], m1, "blue")
     plt.fill_between([j for j in range(len(m1))], m1 - s1, m1 + s1, color='blue', alpha=0.2)
     plt.plot([j for j in range(len(m2))], m2, "orange")
-    plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='red', alpha=0.2)
+    plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='yellow', alpha=0.2)
     plt.plot([j for j in range(len(m3))], m3, "purple")
     plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
     plt.plot([j for j in range(len(m4))], m4, "black")
     plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
+    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
+    plt.xlabel("num-of-epochs")
+    plt.ylabel("MSE")
+    plt.title("cross-validation")
     plt.show()
 
 
