@@ -1,11 +1,14 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
+from modAL.models import ActiveLearner
+from sklearn.datasets import load_iris
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
-# from 线段补全 import record_target_counts
-dir_place = r'.\datasets'
-datasets = pd.read_csv(r'.\datasets\LDS-1518\Data\20343.csv')
+from makeupcurve import record_target_counts
+dir_place = r'C:\Users\22424\Desktop\2020工程文件\北京往事\datasets'
+datasets = pd.read_csv(r'C:\Users\22424\Desktop\2020工程文件\北京往事\datasets\LDS-1518\Data\20343.csv')
 datasets.drop(["Cell HMS LINCS ID", "Small Molecule HMS LINCS ID"],axis=1, inplace=True)
 
 x = datasets.drop(["Mean Normalized Growth Rate Inhibition Value", "Increased Fraction Dead"], axis = 1)
@@ -242,7 +245,7 @@ class dataset_space_matrix():
                 tmp = tmp[(tmp["Cell Name"] == Cell_Name)]
                 GR = tmp["Mean Normalized Growth Rate Inhibition Value"].iloc[
                     layers]
-                # IFD = tmp["Increased Fraction Dead"].iloc[layers]
+                IFD = tmp["Increased Fraction Dead"].iloc[layers]
                 Z[ix, iy] = GR
 
         # fig = plt.figure(figsize=(10.5, 5))
@@ -432,7 +435,6 @@ def accusition_sample(model, remaining_point_sets, threshold=50, shape=(34, 35))
     # plt.show()
     return stds, the_choosen_orders
 
-
 def change1(out_final):
     order_count = []
     for i in range(out_final.shape[0]):
@@ -461,12 +463,40 @@ def change2(out_final):
     letscheck = np.array(letscheck)
     return np.transpose(letscheck), shoot  #返回映射
 
-def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 50, SIFT_NUMBER = 1):
+if __name__ == "__main__":
+    # from 扭曲森林 import accusition_sample
+    from sklearn.metrics import mean_squared_error, r2_score
+    import numpy as np
+    import random
+    import matplotlib.pyplot as plt
+    from sklearn.gaussian_process import GaussianProcessRegressor
+    # from 做一个平坦的版本 import change1, change2
+    from sklearn.gaussian_process.kernels import ConstantKernel, RBF
+    from sklearn.ensemble import RandomForestRegressor
+    from function import *
+
+    rbf = ConstantKernel(1.0) * RBF(length_scale=1.0)
+
+    my_starter = get_ininital_datas_curve_lines()
+    datapool = dataset_space_matrix()
+    start = 8
+    end = 9
+    X, Y, Z, x, y= datapool.show_one_layers(start, end)
+    h = [index for index in range(end - start)]
+    INTER_TIMES = 400
+    SIFT_NUMBER = 1
+
+    # def accusition(model, remaining_point_sets, SIFT_NUMBER=SIFT_NUMBER, shape=(34, 25)):
+    #     _, the_choosen_orders = accusition_sample(model, remaining_point_sets, threshold=SIFT_NUMBER, shape=(34, 25))
+    #     return None, the_choosen_orders
+
+    ######上面是初始数据######
+    # Inintial_threshold = 50
     current_Z = Z.copy()
     datas1 = []
     valid_list = []
     input_space = []
-    COL, ROW = ini_COL, ini_ROW
+    COL, ROW = 2, 2
     for i in range(len(x)):
         for j in range(len(y)):
             for ij in range(len(h)):
@@ -478,122 +508,16 @@ def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 50, SIFT_NUMBER = 1):
     initial_list = valid_list.copy()
     valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
     reg_space = datas1.copy()  # 扔进去训练的数据
-    # input_spacec = input_space.copy()
-    # reg_spacec = reg_space.copy()
-    # input_space = input_spacec.copy()  # 剩余的数据库
-    # reg_space = reg_spacec.copy()  # 扔进去训练的数据
+    input_spacec = input_space.copy()
+    reg_spacec = reg_space.copy()
+    current_Z = Z.copy()
+    input_space = input_spacec.copy()  # 剩余的数据库
+    reg_space = reg_spacec.copy()  # 扔进去训练的数据
     inputs, result, reg_space_index = data_extract(reg_space, current_Z)
-    recordsss = []
+    record2 = []
     shoot1 = [i for i in range(len(x))]
     shoot2 = [i for i in range(len(y))]
     # model = GaussianProcessRegressor(kernel=rbf)
-    model = RandomForestRegressor(n_estimators=40)
-    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-    output = model.predict(valid_list_model)
-    out_final = transmit_final3d(output, valid_list, current_Z)
-    out_record = out_final.copy()
-    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
-    # shoot1_, shoot2_ = change_matrix(out_final2)
-    # _, shoot1_, shoot2_ = change_cubes(current_Z)
-    # shoot1 = arrange_shoot(shoot1, shoot1_)
-    # shoot2 = arrange_shoot(shoot2, shoot2_)
-    for times in range(INTER_TIMES):
-        if times != 0:
-            random.shuffle(input_space)
-            for i in range(SIFT_NUMBER):
-                reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
-
-        inputs, result, _ = data_extract(reg_space, current_Z)
-        # model = GaussianProcessRegressor()
-        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-        # 检查模型的效果#
-        output = model.predict(valid_list_model)
-        out_final = transmit_final3d(output, valid_list, current_Z)
-        recordsss.append(
-            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
-
-    return recordsss
-
-def train_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
-    current_Z = Z.copy()
-    datas1 = []
-    valid_list = []
-    input_space = []
-    COL, ROW = ini_COL, ini_ROW
-    for i in range(len(x)):
-        for j in range(len(y)):
-            for ij in range(len(h)):
-                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                if i == COL or j == i:
-                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                else:
-                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
-    initial_list = valid_list.copy()
-    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
-    reg_space = datas1.copy()  # 扔进去训练的数据
-    # input_spacec = input_space.copy()
-    # reg_spacec = reg_space.copy()
-    # input_space = input_spacec.copy()  # 剩余的数据库
-    # reg_space = reg_spacec.copy()  # 扔进去训练的数据
-    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
-    recordsss = []
-    shoot1 = [i for i in range(len(x))]
-    shoot2 = [i for i in range(len(y))]
-    # model = GaussianProcessRegressor(kernel=rbf)
-    model = RandomForestRegressor(n_estimators=40)
-    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-    output = model.predict(valid_list_model)
-    out_final = transmit_final3d(output, valid_list, current_Z)
-    out_record = out_final.copy()
-    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
-    # shoot1_, shoot2_ = change_matrix(out_final2)
-    _, shoot1_, shoot2_ = change_cubes(current_Z)
-    shoot1 = arrange_shoot(shoot1, shoot1_)
-    shoot2 = arrange_shoot(shoot2, shoot2_)
-    for times in range(INTER_TIMES):
-        if times != 0:
-            random.shuffle(input_space)
-            for i in range(SIFT_NUMBER):
-                reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
-
-        inputs, result, _ = data_extract(reg_space, current_Z)
-        # model = GaussianProcessRegressor()
-        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-        # 检查模型的效果#
-        output = model.predict(valid_list_model)
-        out_final = transmit_final3d(output, valid_list, current_Z)
-        recordsss.append(
-            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
-
-    return recordsss
-
-def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
-    current_Z = Z.copy()
-    datas1 = []
-    valid_list = []
-    input_space = []
-    COL, ROW = ini_COL, ini_ROW
-    for i in range(len(x)):
-        for j in range(len(y)):
-            for ij in range(len(h)):
-                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                if i == COL or j == i:
-                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                else:
-                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
-    initial_list = valid_list.copy()
-    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
-    reg_space = datas1.copy()  # 扔进去训练的数据
-    # input_spacec = input_space.copy()
-    # reg_spacec = reg_space.copy()
-    # input_space = input_spacec.copy()  # 剩余的数据库
-    # reg_space = reg_spacec.copy()  # 扔进去训练的数据
-    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
-    recordsss = []
-    shoot1 = [i for i in range(len(x))]
-    shoot2 = [i for i in range(len(y))]
     model = RandomForestRegressor(n_estimators=40)
     model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
     output = model.predict(valid_list_model)
@@ -618,7 +542,7 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
     #             c="red", marker="x")
     # plt.colorbar()
     out_record = out_final.copy()
-    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    record2.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
     for times in range(INTER_TIMES):
         ######
         # out_final, shoot1 = change1(out_final)
@@ -635,11 +559,181 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
         #     add_this_time.append(input_space.pop(index))
         # reg_space = reg_space + add_this_time
         # print(times, len(reg_space), len(input_space))
-        if times % 5 == 0:
-            # shoot1_, shoot2_ = change_matrix(out_final)
-            _, shoot1_, shoot2_ = change_cubes(out_final)
+        if times % 5 == 0 and times <= 40:
+            shoot1_, shoot2_ = change_matrix(out_final)
+            # _, shoot1_, shoot2_ = change_cubes(out_final)
             shoot1 = arrange_shoot(shoot1, shoot1_)
             shoot2 = arrange_shoot(shoot2, shoot2_)
+
+        if times != 0:
+            random.shuffle(input_space)
+            for i in range(SIFT_NUMBER):
+                reg_space.append(input_space.pop(i))
+            print(times, len(reg_space), len(input_space))
+
+        inputs, result, _ = data_extract(reg_space, current_Z)
+        # model = GaussianProcessRegressor()
+        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+        # 检查模型的效果#
+        output = model.predict(valid_list_model)
+        out_final = transmit_final3d(output, valid_list, current_Z)
+
+
+        record2.append(
+            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
+        # if times < 10:
+        #     plt.figure(1)
+        #     plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+        #     plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 c="red", marker="x")
+        #     plt.colorbar()
+        #     plt.figure(2)
+        #     plt.contourf(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+        #     plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 c="red", marker="x")
+        #     plt.colorbar()
+        #     plt.show()
+
+
+    input_space = input_spacec.copy()  # 剩余的数据库
+    reg_space = reg_spacec.copy()  # 扔进去训练的数据
+    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
+    record3 = []
+    shoot1 = [i for i in range(len(x))]
+    shoot2 = [i for i in range(len(y))]
+    # model = GaussianProcessRegressor(kernel=rbf)
+    model = RandomForestRegressor(n_estimators=40)
+    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    output = model.predict(valid_list_model)
+    out_final = transmit_final3d(output, valid_list, current_Z)
+    # plt.figure(1)
+    # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    # plt.figure(2)
+    # plt.contourf(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    # plt.show()
+    # plt.figure(122)
+    # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    out_record = out_final.copy()
+    record3.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    for times in range(INTER_TIMES):
+        ######
+        # out_final, shoot1 = change1(out_final)
+        # out_final, shoot2 = change2(out_final)
+        # current_Z = move_matrix(current_Z, shoot1, shoot2)
+        ######
+        # _, the_choosen_orders = accusition(model, data_extract(input_space, current_Z)[2], shape=X.shape)
+        # the_choosen_orders.sort(reverse=True)
+        # # print(len(input_space))
+        # # for index in range(len(the_choosen_orders)):
+        # #     reg_space.append(input_space.pop(index))
+        # add_this_time = []
+        # for index in range(len(the_choosen_orders)):
+        #     add_this_time.append(input_space.pop(index))
+        # reg_space = reg_space + add_this_time
+        # print(times, len(reg_space), len(input_space))
+        # if times % 5 == 0 and times <= 25:
+        #     _, shoot1_, shoot2_ = change_cubes(out_final)
+        #     shoot1 = arrange_shoot(shoot1, shoot1_)
+        #     shoot2 = arrange_shoot(shoot2, shoot2_)
+
+        if times != 0:
+            random.shuffle(input_space)
+            for i in range(SIFT_NUMBER):
+                reg_space.append(input_space.pop(i))
+            print(times, len(reg_space), len(input_space))
+
+        inputs, result, _ = data_extract(reg_space, current_Z)
+        # model = GaussianProcessRegressor()
+        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+        # 检查模型的效果#
+        output = model.predict(valid_list_model)
+        out_final = transmit_final3d(output, valid_list, current_Z)
+
+        record3.append(
+            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
+        # if times < 10:
+        #     plt.figure(1)
+        #     plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+        #     plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 c="red", marker="x")
+        #     plt.colorbar()
+        #     plt.figure(2)
+        #     plt.contourf(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+        #     plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+        #                 c="red", marker="x")
+        #     plt.colorbar()
+        #     plt.show()
+
+
+
+    input_space = input_spacec.copy()  # 剩余的数据库
+    reg_space = reg_spacec.copy()  # 扔进去训练的数据
+    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
+    record4 = []
+    shoot1 = [i for i in range(len(x))]
+    shoot2 = [i for i in range(len(y))]
+    # model = GaussianProcessRegressor(kernel=rbf)
+    model = RandomForestRegressor(n_estimators=40)
+    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    output = model.predict(valid_list_model)
+    out_final = transmit_final3d(output, valid_list, current_Z)
+    # plt.figure(1)
+    # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    # plt.figure(2)
+    # plt.contourf(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    # plt.show()
+    # plt.figure(122)
+    # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #             c="red", marker="x")
+    # plt.colorbar()
+    out_record = out_final.copy()
+    record4.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    for times in range(INTER_TIMES):
+        ######
+        # out_final, shoot1 = change1(out_final)
+        # out_final, shoot2 = change2(out_final)
+        # current_Z = move_matrix(current_Z, shoot1, shoot2)
+        ######
+        # _, the_choosen_orders = accusition(model, data_extract(input_space, current_Z)[2], shape=X.shape)
+        # the_choosen_orders.sort(reverse=True)
+        # # print(len(input_space))
+        # # for index in range(len(the_choosen_orders)):
+        # #     reg_space.append(input_space.pop(index))
+        # add_this_time = []
+        # for index in range(len(the_choosen_orders)):
+        #     add_this_time.append(input_space.pop(index))
+        # reg_space = reg_space + add_this_time
+        # print(times, len(reg_space), len(input_space))
+        # if times % 5 == 0 and times <= 25:
+        #     _, shoot1_, shoot2_ = change_cubes(out_final)
+        #     shoot1 = arrange_shoot(shoot1, shoot1_)
+        #     shoot2 = arrange_shoot(shoot2, shoot2_)
 
         if times != 0:
             acq_inputs, _, _ = data_extract(input_space, current_Z)
@@ -654,12 +748,6 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
                 add_this_time.append(input_space.pop(index))
             reg_space = reg_space + add_this_time
 
-        # if times != 0 and times >= 15:
-        #     random.shuffle(input_space)
-        #     for i in range(SIFT_NUMBER):
-        #         reg_space.append(input_space.pop(i))
-        #     print(times, len(reg_space), len(input_space))
-
         print(times, len(reg_space), len(input_space))
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
@@ -668,36 +756,17 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
         output = model.predict(valid_list_model)
         out_final = transmit_final3d(output, valid_list, current_Z)
 
-        recordsss.append(
+        record4.append(
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
-    return recordsss
 
-def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
-    current_Z = Z.copy()
-    datas1 = []
-    valid_list = []
-    input_space = []
-    COL, ROW = ini_COL, ini_ROW
-    for i in range(len(x)):
-        for j in range(len(y)):
-            for ij in range(len(h)):
-                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                if i == COL or j == i:
-                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                else:
-                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
-    initial_list = valid_list.copy()
-    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
-    reg_space = datas1.copy()  # 扔进去训练的数据
-    # input_spacec = input_space.copy()
-    # reg_spacec = reg_space.copy()
-    # input_space = input_spacec.copy()  # 剩余的数据库
-    # reg_space = reg_spacec.copy()  # 扔进去训练的数据
+    input_space = input_spacec.copy()  # 剩余的数据库
+    reg_space = reg_spacec.copy()  # 扔进去训练的数据
     inputs, result, reg_space_index = data_extract(reg_space, current_Z)
-    recordsss = []
+    record5 = []
     shoot1 = [i for i in range(len(x))]
     shoot2 = [i for i in range(len(y))]
+    # model = GaussianProcessRegressor(kernel=rbf)
     model = RandomForestRegressor(n_estimators=40)
     model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
     output = model.predict(valid_list_model)
@@ -722,7 +791,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
     #             c="red", marker="x")
     # plt.colorbar()
     out_record = out_final.copy()
-    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    record5.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
     for times in range(INTER_TIMES):
         ######
         # out_final, shoot1 = change1(out_final)
@@ -739,7 +808,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
         #     add_this_time.append(input_space.pop(index))
         # reg_space = reg_space + add_this_time
         # print(times, len(reg_space), len(input_space))
-        if times % 5 == 0 and times < 40:
+        if times % 5 == 0 and times <= 40:
             shoot1_, shoot2_ = change_matrix(out_final)
             # _, shoot1_, shoot2_ = change_cubes(out_final)
             shoot1 = arrange_shoot(shoot1, shoot1_)
@@ -772,140 +841,101 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
         output = model.predict(valid_list_model)
         out_final = transmit_final3d(output, valid_list, current_Z)
 
-        recordsss.append(
+        record5.append(
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
-    return recordsss
-
-def train_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
-    current_Z = Z.copy()
-    datas1 = []
-    valid_list = []
-    input_space = []
-    COL, ROW = ini_COL, ini_ROW
-    for i in range(len(x)):
-        for j in range(len(y)):
-            for ij in range(len(h)):
-                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                if i == COL or j == i:
-                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
-                else:
-                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
-    initial_list = valid_list.copy()
-    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
-    reg_space = datas1.copy()  # 扔进去训练的数据
-    # input_spacec = input_space.copy()
-    # reg_spacec = reg_space.copy()
+    # current_Z = Z.copy()
+    # shoot1 = [i for i in range(len(x))]
+    # shoot2 = [i for i in range(len(y))]
     # input_space = input_spacec.copy()  # 剩余的数据库
     # reg_space = reg_spacec.copy()  # 扔进去训练的数据
-    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
-    recordsss = []
-    shoot1 = [i for i in range(len(x))]
-    shoot2 = [i for i in range(len(y))]
-    # model = GaussianProcessRegressor(kernel=rbf)
-    model = RandomForestRegressor(n_estimators=40)
-    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-    output = model.predict(valid_list_model)
-    out_final = transmit_final3d(output, valid_list, current_Z)
-    out_record = out_final.copy()
-    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
-    # shoot1_, shoot2_ = change_matrix(out_final2)
-    # _, shoot1_, shoot2_ = change_cubes(current_Z)
-    # shoot1 = arrange_shoot(shoot1, shoot1_)
-    # shoot2 = arrange_shoot(shoot2, shoot2_)
-    for times in range(INTER_TIMES):
-        if times != 0:
-            acq_inputs, _, _ = data_extract(input_space, current_Z)
-            stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
-                                                         shape=X.shape,
-                                                         threshold=SIFT_NUMBER)
+    # inputs, result, reg_space_index = data_extract(reg_space, current_Z)
+    # record = []
+    #
+    # # model = GaussianProcessRegressor(kernel=rbf)
+    # model = RandomForestRegressor(n_estimators=40)
+    # model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    # output = model.predict(valid_list_model)
+    # out_final = transmit_final3d(output, valid_list, current_Z)
+    # shoot1 = [i for i in range(len(x))]
+    # shoot2 = [i for i in range(len(y))]
+    # # _, shoot1_, shoot2_ = change_cubes(out_final)
+    # # shoot1 = arrange_shoot(shoot1, shoot1_)
+    # # shoot2 = arrange_shoot(shoot2, shoot2_)
+    # record.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    # # model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    # # print(f"这次的输入是：{shoot_change_input(inputs, shoot1, shoot2)}")
+    # # 检查模型的效果#
+    # # output, _ = model.predict(valid_list_model,
+    # #                           return_std=True)
+    # # out_final = transmit_final3d(output, valid_list, current_Z)
+    # # _, shoot1_, shoot2_ = change_cubes(out_final)
+    # # shoot1 = arrange_shoot(shoot1, shoot1_)
+    # # shoot2 = arrange_shoot(shoot2, shoot2_)
+    # # # plt.figure()
+    # # # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    # # # plt.colorbar()
+    # # # plt.show()
+    # # record2.append(mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
+    #
+    # for times in range(INTER_TIMES):
+    #     ######
+    #     # out_final, shoot1 = change1(out_final)
+    #     # out_final, shoot2 = change2(out_final)
+    #     # current_Z = move_matrix(current_Z, shoot1, shoot2)
+    #     ######
+    #     # _, the_choosen_orders = accusition(model, data_extract(input_space, current_Z)[2], shape=X.shape)
+    #     # the_choosen_orders.sort(reverse=True)
+    #     # # print(len(input_space))
+    #     # # for index in range(len(the_choosen_orders)):
+    #     # #     reg_space.append(input_space.pop(index))
+    #     # add_this_time = []
+    #     # for index in range(len(the_choosen_orders)):
+    #     #     add_this_time.append(input_space.pop(index))
+    #     # reg_space = reg_space + add_this_time
+    #     # print(times, len(reg_space), len(input_space))
+    #
+    #     random.shuffle(input_space)
+    #     for i in range(SIFT_NUMBER):
+    #         reg_space.append(input_space.pop(i))
+    #     print(times, len(reg_space), len(input_space))
+    #
+    #     inputs, result, _ = data_extract(reg_space, Z)
+    #     # model = GaussianProcessRegressor()
+    #     model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    #     # 检查模型的效果#
+    #     output = model.predict(valid_list_model)
+    #     out_final = transmit_final3d(output, valid_list, current_Z)
+    #     if times % 5 == 0 and times <= 25:
+    #         pass
+    #         # _, shoot1_, shoot2_ = change_cubes(out_final)
+    #         # shoot1 = arrange_shoot(shoot1, shoot1_)
+    #         # shoot2 = arrange_shoot(shoot2, shoot2_)
+    #         # plt.figure()
+    #         # plt.contourf(X, Y, np.transpose(out_final[-1, :, :]))
+    #         # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #         #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    #         #             c="red", marker="x")
+    #         # # plt.colorbar()
+    #         # plt.show()
+    #     # out_final, _ = change1(out_final)
+    #     # out_final, _ = change2(out_final)
+    #     # plt.figure(1)
+    #     # plt.contourf(X, Y, out_final)
+    #     # # plt.colorbar()
+    #     # # plt.show()
+    #     record.append(
+    #         mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
-            the_choosen_orders.sort(reverse=True)
-            # print(len(input_space))
-            add_this_time = []
-            for index in the_choosen_orders:
-                add_this_time.append(input_space.pop(index))
-            reg_space = reg_space + add_this_time
 
-        inputs, result, _ = data_extract(reg_space, current_Z)
-        # model = GaussianProcessRegressor()
-        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
-        # 检查模型的效果#
-        output = model.predict(valid_list_model)
-        out_final = transmit_final3d(output, valid_list, current_Z)
-        recordsss.append(
-            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
-    return recordsss
 
-train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4:train_STD}
-
-def train_turn(xx, yy, ZZ, type1= 0, num=10, epcohs=100):
-    recordd = []
-    COL = [i for i in range(len(xx))]
-    ROW = [i for i in range(len(yy))]
-    random.shuffle(COL)
-    random.shuffle(ROW)
-    for i in range(num):
-        recordd.append(np.array(train_dict[type1](ZZ, COL[i], ROW[i], epcohs)))
-
-    sum = np.zeros(epcohs + 1)
-    for item in recordd:
-        sum += item
-    means = sum / num
-
-    recordds = np.array(recordd)
-    # print(recordds.shape)
-    stdss = np.zeros(epcohs + 1)
-    for i in range(len(stdss)):
-        # print(len(recordds[:, i]))
-        stdss[i] = np.std(recordds[:, i])
-    # print(means)
-
-    return recordd, means, stdss
-
-if __name__ == "__main__":
-    from sklearn.metrics import mean_squared_error, r2_score
-    import numpy as np
-    import random
-    import matplotlib.pyplot as plt
-    from sklearn.gaussian_process import GaussianProcessRegressor
-    from sklearn.gaussian_process.kernels import ConstantKernel, RBF
-    from sklearn.ensemble import RandomForestRegressor
-    from function import *
-
-    rbf = ConstantKernel(1.0) * RBF(length_scale=1.0)
-
-    my_starter = get_ininital_datas_curve_lines()
-    datapool = dataset_space_matrix()
-    start = 8
-    end = 9
-    X, Y, Z, x, y= datapool.show_one_layers(start, end)
-    h = [index for index in range(end - start)]
-    INTER_TIMES = 200
-    SIFT_NUMBER = 1
-
-    r, m, s = train_turn(x, y, Z, 0, epcohs=INTER_TIMES)
-    r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
-    r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
-    r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
-    r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
-
-    plt.figure()
-    plt.plot([j for j in range(len(m))], m, "red")
-    plt.fill_between([j for j in range(len(m))], m - s, m + s, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m1))], m1, "blue")
-    plt.fill_between([j for j in range(len(m1))], m1 - s1, m1 + s1, color='blue', alpha=0.2)
-    plt.plot([j for j in range(len(m2))], m2, "orange")
-    plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='yellow', alpha=0.2)
-    plt.plot([j for j in range(len(m3))], m3, "purple")
-    plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m4))], m4, "black")
-    plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
-    plt.xlabel("num-of-epochs")
-    plt.ylabel("MSE")
-    plt.title("cross-validation")
+    # print(record2)
+    plt.figure(200)
+    plt.plot([x for x in range(len(record2))], record2, "orange")
+    plt.plot([x for x in range(len(record3))], record3, "purple")
+    plt.plot([x for x in range(len(record4))], record4, "blue")
+    plt.plot([x for x in range(len(record5))], record5, "red")
+    plt.legend(["move matrix", "raw", "raw_std","move std"])
+    plt.title("GR am")
     plt.show()
-
-

@@ -9,9 +9,12 @@ This py documment serves as cross-validation on random-forest regressor, the run
 In this py file, it writes the clustering adjustment method and other assist functions.
 
 4.BO3.py
-This function could be used to go through a whole turn by comparing random sampling method and other active learning methods in GP model.
+This function could be used to go through a whole turn by comparing random sampling method and other active learning methods in Guassian process model.
 
 5.one-dimension-test.py
 This file exhibits the effect of my methodology on simple 1-D situations.
 
-6.
+6.Random-forest-4-trial
+This function could be used to go through a whole turn by comparing random sampling method and other active learning methods in Random forest model.
+
+7.the rest document are some middle file which are used to check the process and the effect of code when I am training model.

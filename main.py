@@ -772,13 +772,13 @@ if __name__ == "__main__":
     end = 9
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
-    INTER_TIMES = 400
+    INTER_TIMES = 200
     SIFT_NUMBER = 1
 
-    r, m, s = train_turn(x,y,Z,0)
-    r1, m1, s1 = train_turn(x, y, Z, 1)
-    r2, m2, s2 = train_turn(x, y, Z, 2)
-    r3, m3, s3 = train_turn(x, y, Z, 3)
+    r, m, s = train_turn(x,y,Z,0, epcohs=INTER_TIMES)
+    r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
+    r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
+    r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
 
     plt.figure()
     plt.plot([j for j in range(len(m))], m, "red")
@@ -788,8 +788,8 @@ if __name__ == "__main__":
     plt.plot([j for j in range(len(m2))], m2, "orange")
     plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='red', alpha=0.2)
     plt.plot([j for j in range(len(m3))], m3, "purple")
-    plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
+    plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='purple', alpha=0.2)
+    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs"])
     plt.xlabel("num-of-epochs")
     plt.ylabel("MSE")
     plt.title("cross-validation")
