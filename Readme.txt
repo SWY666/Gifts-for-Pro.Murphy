@@ -1,3 +1,5 @@
+Introduction of the project
+
 1. main.py
 This py document serves as final cross-validation of different active learning methods on Gaussian process model, because the cross-validation is more stable for its high iteration times, hence I set it as main.py so that we could get more reliable and stable active learning effects.
 In the main.py, I set 4 counterparts--raw matrix, AM on raw matrix, AM per 5 epochs, Clustering movement per 5 epochs. The last two methods are all recessive active learning ways I mention in my paper. 
@@ -18,3 +20,11 @@ This file exhibits the effect of my methodology on simple 1-D situations.
 This function could be used to go through a whole turn by comparing random sampling method and other active learning methods in Random forest model.
 
 7.the rest document are some middle file which are used to check the process and the effect of code when I am training model.
+
+8.datasets
+The file contains the datasets of this trial, ".\datasets\LDS-1518\Data\20343.csv".
+
+More files might be made up in future ；）
+If you meet some questions or have some advice, please do email me through 2242469978@qq.com! I will be appreciate if you could talk to me.
+
+Author: Sun Weiyu
