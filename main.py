@@ -22,7 +22,7 @@ Drug_Name_list = []
 for value, group in grouped2:
 #     print(group["Small Molecule Name"].values)
     Drug_Name_list.append(group["Small Molecule Name"].values[0])
-
+#form the datasets class
 def plot_pic_GR(Cell_order=0,Drug_order=0,x=x, y=y,Drug_Name_list=Drug_Name_list,Cell_Name_list=Cell_Name_list):
     Drug_Name = Drug_Name_list[Drug_order]
     Cell_Name = Cell_Name_list[Cell_order]
@@ -45,10 +45,10 @@ def plot_pic_GR(Cell_order=0,Drug_order=0,x=x, y=y,Drug_Name_list=Drug_Name_list
     plt.title(f"Drug_concentration--GR\nCell name:{Cell_Name}  Drug name:{Drug_Name}\naxis=({Cell_order}, {Drug_order})")
     plt.ylim((-1.5, 1.5))
     plt.show()
-
+#form the datasets class
 the_data_pool = np.ones((len(Cell_Name_list), len(Drug_Name_list), 10), dtype=np.int)
 
-#获取初始值，尽量用最少的数据拿出最多的药物和细胞的种类。
+#form the datasets class
 def get_ininital_datas(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=9):
     initial_choice = []
     initial_list = [x for x in range(len(Drug_Name_list))]
@@ -58,8 +58,7 @@ def get_ininital_datas(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Na
     for i in range(len(initial_list)):
         initial_choice.append((i, initial_list[i], range_of_Concentration - 1))
     return initial_choice
-
-#初始选点
+#form the datasets class
 def get_ininital_datas_two_points(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=9):
     the_observer_D = [i for i in range(len(Drug_Name_list))]
     the_observer_C = [i for i in range(len(Cell_Name_list))]
@@ -71,11 +70,11 @@ def get_ininital_datas_two_points(Drug_Name_list = Drug_Name_list, Cell_Name_lis
     end_list = [range_of_Concentration for i in range(len(the_choice))]
     the_choice = list(zip(the_observer_C, the_observer_D, start_list)) + list(zip(the_observer_C, the_observer_D, end_list))
     return the_choice
-
+#form the datasets class
 def generate_test_matrix(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=9):
     test_matrix = [[[True, [True for i in range(range_of_Concentration)]] for ii in range(len(Drug_Name_list))] for iii in range(len(Cell_Name_list))]
     print(np.array(test_matrix).shape)
-#我这里使用的datapool 框架↓
+#data sets class, critical!!!!!!!
 class dataset_space_matrix():
     #构造函数
     def __init__(self, Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=9, x=x, y=y):
@@ -260,15 +259,15 @@ class dataset_space_matrix():
 
         return X, Y, np.array(final_Z), x, y
 #
-#对曲线进行分类, 这里就先用KNN吧。
+#no use
 def classify_curves():
     print("分类曲线")
     pass
-#对所有曲线进行补全，根据这个分类情况。
+#no use
 def make_up_curves():
     print("曲线优化补全")
     pass
-#初始选点
+#activate the class of datasets
 def get_ininital_datas_curve_lines(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=10):
     the_observer_D = [i for i in range(len(Drug_Name_list))]
     the_observer_C = [i for i in range(len(Cell_Name_list))]
@@ -277,7 +276,7 @@ def get_ininital_datas_curve_lines(Drug_Name_list = Drug_Name_list, Cell_Name_li
     # the_observer_C.pop()
     the_choice = list(zip(the_observer_C, the_observer_D))
     return the_choice
-#
+#not used in this case
 def get_observation_data(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_Name_list, range_of_Concentration=10):
     the_observer_D = [i for i in range(len(Drug_Name_list))]
     the_observer_C = [i for i in range(len(Cell_Name_list))]
@@ -289,7 +288,7 @@ def get_observation_data(Drug_Name_list = Drug_Name_list, Cell_Name_list = Cell_
     for i in range(len(the_choice)):
         result.append([the_choice[i]] + [x] for x in range(10))
     return result
-
+#search values in the true data pool
 def data_extract(reg_space, current_Z):
     reg_space_result = []
     reg_space_input = []
@@ -302,13 +301,13 @@ def data_extract(reg_space, current_Z):
     reg_space_result = np.array(reg_space_result)
     reg_space_index = np.array(reg_space_index)
     return reg_space_input, reg_space_result, reg_space_index
-
+#not be used in this case
 def transmit_final(output, valid_list, X):
     out_final = np.zeros(X.shape)
     for index in range(len(valid_list)):
         out_final[valid_list[index][1][0], valid_list[index][1][1]] = output[index]
     return out_final
-
+#adjust matrix with given shoot1, shoot2(the arrangement of moving matrix)
 def move_matrix(current_Z, shoot1, shoot2):
     # print("进来", current_Z.shape)
     order_count = []
@@ -327,7 +326,6 @@ def move_matrix(current_Z, shoot1, shoot2):
         tmp.append(order_count[shoot2[i]][1])
     result = np.array(tmp)
     return np.transpose(result)
-
 #turn the final output vector into the shape of target matrix/cubes
 def transmit_final3d(output, valid_list, current_Z):
     out_final = np.zeros(current_Z.shape)
@@ -451,7 +449,7 @@ def change2(out_final):
         shoot.append(order_count[i][0])
     letscheck = np.array(letscheck)
     return np.transpose(letscheck), shoot  #返回映射
-
+#SC on GP model
 def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -505,7 +503,7 @@ def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
+#AM_on true data pool on GP model
 def train_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -559,7 +557,7 @@ def train_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
+#Clustering on GP model
 def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -642,7 +640,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
+#AM & std on GP model
 def train_MOVE_AM_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -725,7 +723,7 @@ def train_MOVE_AM_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBE
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
+#AM on GP model
 def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -802,7 +800,7 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
+#Clustering & std on GP model
 def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
@@ -889,7 +887,8 @@ def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER
 #the diction of different training ways
 train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5:train_MOVE_AM_STD}
 
-
+#pick one training method and test it for (num=15) times with 200 epochs for each
+#the training method could be check in "type1", the training method could be found in "train_dict" above
 def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
     recordd = []
     COL = [i for i in range(len(xx))]
