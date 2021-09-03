@@ -40,6 +40,7 @@ def accusition_sampleb(model, remaining_point_sets, threshold=50, shape=(34, 35)
         stds_final[int(remaining_point_sets[index][2]) - 1, int(remaining_point_sets[index][1]) - 1] = stds[index]
     stds_judge = np.c_[stds, [x for x in range(len(remaining_point_sets))], [x for x in remaining_point_sets]].tolist()
     stds_judge = sorted(stds_judge, key=lambda x: x[0])
+    print(stds_judge)
     stds_judges = stds_judge.copy()
     stds_judge = stds_judge[-threshold:]
 

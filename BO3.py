@@ -410,6 +410,7 @@ def accusition_sample(model, remaining_point_sets, threshold=50, shape=(34, 35))
 
     stds_judge = np.c_[stds, [x for x in range(len(remaining_point_sets))], [x for x in remaining_point_sets]].tolist()
     stds_judge = sorted(stds_judge, key=lambda x: x[0])
+    # print("let's check", stds_judge[-10:])
     stds_judge = stds_judge[-threshold:]
     # print(stds_judge)
     # the_choosen_ones = [[int(stds_judge[x][1]), int(stds_judge[x][2])] for x in range(len(stds_judge))]
@@ -464,7 +465,7 @@ if __name__ == "__main__":
     from sklearn.ensemble import RandomForestRegressor
     from function import *
 
-    rbf = ConstantKernel(1.0) * RBF(length_scale=1.0)
+    rbf = ConstantKernel(1) * RBF(length_scale=1.0)
 
     my_starter = get_ininital_datas_curve_lines()
     datapool = dataset_space_matrix()

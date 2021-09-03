@@ -641,18 +641,24 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
             shoot1 = arrange_shoot(shoot1, shoot1_)
             shoot2 = arrange_shoot(shoot2, shoot2_)
 
-        if times != 0:
-            acq_inputs, _, _ = data_extract(input_space, current_Z)
-            stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
-                                                         shape=X.shape,
-                                                         threshold=SIFT_NUMBER)
+        # if times != 0:
+        #     acq_inputs, _, _ = data_extract(input_space, current_Z)
+        #     stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
+        #                                                  shape=X.shape,
+        #                                                  threshold=SIFT_NUMBER)
+        #
+        #     the_choosen_orders.sort(reverse=True)
+        #     # print(len(input_space))
+        #     add_this_time = []
+        #     for index in the_choosen_orders:
+        #         add_this_time.append(input_space.pop(index))
+        #     reg_space = reg_space + add_this_time
 
-            the_choosen_orders.sort(reverse=True)
-            # print(len(input_space))
-            add_this_time = []
-            for index in the_choosen_orders:
-                add_this_time.append(input_space.pop(index))
-            reg_space = reg_space + add_this_time
+        if times != 0:
+            random.shuffle(input_space)
+            for i in range(SIFT_NUMBER):
+                reg_space.append(input_space.pop(i))
+            print(times, len(reg_space), len(input_space))
 
         # if times != 0 and times >= 15:
         #     random.shuffle(input_space)
@@ -745,18 +751,25 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
             shoot1 = arrange_shoot(shoot1, shoot1_)
             shoot2 = arrange_shoot(shoot2, shoot2_)
 
-        if times != 0:
-            acq_inputs, _, _ = data_extract(input_space, current_Z)
-            stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
-                                                         shape=X.shape,
-                                                         threshold=SIFT_NUMBER)
+        # if times != 0:
+        #     acq_inputs, _, _ = data_extract(input_space, current_Z)
+        #     stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
+        #                                                  shape=X.shape,
+        #                                                  threshold=SIFT_NUMBER)
+        #
+        #     the_choosen_orders.sort(reverse=True)
+        #     # print(len(input_space))
+        #     add_this_time = []
+        #     for index in the_choosen_orders:
+        #         add_this_time.append(input_space.pop(index))
+        #     reg_space = reg_space + add_this_time
 
-            the_choosen_orders.sort(reverse=True)
-            # print(len(input_space))
-            add_this_time = []
-            for index in the_choosen_orders:
-                add_this_time.append(input_space.pop(index))
-            reg_space = reg_space + add_this_time
+
+        if times != 0:
+            random.shuffle(input_space)
+            for i in range(SIFT_NUMBER):
+                reg_space.append(input_space.pop(i))
+            print(times, len(reg_space), len(input_space))
 
         # if times != 0 and times >= 15:
         #     random.shuffle(input_space)
@@ -882,14 +895,14 @@ if __name__ == "__main__":
     end = 9
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
-    INTER_TIMES = 200
+    INTER_TIMES = 150
     SIFT_NUMBER = 1
 
     r, m, s = train_turn(x, y, Z, 0, epcohs=INTER_TIMES)
     r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
     r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
     r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
-    r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
+    # r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
 
     plt.figure()
     plt.plot([j for j in range(len(m))], m, "red")
@@ -900,8 +913,8 @@ if __name__ == "__main__":
     plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='yellow', alpha=0.2)
     plt.plot([j for j in range(len(m3))], m3, "purple")
     plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m4))], m4, "black")
-    plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
+    # plt.plot([j for j in range(len(m4))], m4, "black")
+    # plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
     plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
     plt.xlabel("num-of-epochs")
     plt.ylabel("MSE")
