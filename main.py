@@ -328,27 +328,26 @@ def move_matrix(current_Z, shoot1, shoot2):
     result = np.array(tmp)
     return np.transpose(result)
 
+#turn the final output vector into the shape of target matrix/cubes
 def transmit_final3d(output, valid_list, current_Z):
     out_final = np.zeros(current_Z.shape)
     for index in range(len(valid_list)):
         out_final[valid_list[index][1][0], valid_list[index][1][1], valid_list[index][1][2]] = output[index]
     return out_final
-
-#这个操作仅仅用来对比最后的范数，在迭代过程中不应该使用这个函数
+#AM method on matrix/cubes
 def change_cubes(current_Z):
     top_Z = current_Z[-1, :, :]
     top_Z, shoot1 = change1(top_Z)
     _, shoot2 = change2(top_Z)
     new_current_Z = [move_matrix(current_Z[index, :, :], shoot1, shoot2) for index in range(current_Z.shape[0])]
     return np.array(new_current_Z), shoot1, shoot2
-
-def change_cubes_visit(current_Z, shoot1, shoot2):
-    # top_Z = current_Z[-1, :, :]
-    # top_Z, shoot1 = change1(top_Z)
-    # _, shoot2 = change2(top_Z)
-    new_current_Z = [move_matrix(current_Z[index, :, :], shoot1, shoot2) for index in range(current_Z.shape[0])]
-    return np.array(new_current_Z), shoot1, shoot2
-
+# def change_cubes_visit(current_Z, shoot1, shoot2):
+#     # top_Z = current_Z[-1, :, :]
+#     # top_Z, shoot1 = change1(top_Z)
+#     # _, shoot2 = change2(top_Z)
+#     new_current_Z = [move_matrix(current_Z[index, :, :], shoot1, shoot2) for index in range(current_Z.shape[0])]
+#     return np.array(new_current_Z), shoot1, shoot2
+#not be used in the case
 def change_cubes_with_visit(current_Z, out_final):
     scores = [np.sum(out_final[index, :, :]) for index in range(out_final.shape[0])]
     print(scores)
@@ -361,7 +360,6 @@ def change_cubes_with_visit(current_Z, out_final):
     # _, shoot2 = change2(top_Z)
     new_current_Z = [move_matrix(current_Z[index, :, :], shoot1, shoot2) for index in range(current_Z.shape[0])]
     return np.array(new_current_Z)
-
 # def shoot_change_input(inputs, shoot1, shoot2):
 #     shoot1s = [(i, shoot1[i]) for i in range(len(shoot1))]
 #     shoot1s.sort(key=lambda k:k[1])
@@ -376,6 +374,8 @@ def change_cubes_with_visit(current_Z, out_final):
 #         result.append([item[0], shoot1[int(item[1]) - 1], shoot2[int(item[2]) - 1]])
 #     return np.array(result)
 
+
+#adjust the input sampling point position with sampling points
 def shoot_change_input(inputs, shoot1, shoot2):
     shoot1s = [(i, shoot1[i]) for i in range(len(shoot1))]
     shoot1s.sort(key=lambda k:k[1])
@@ -389,18 +389,17 @@ def shoot_change_input(inputs, shoot1, shoot2):
     for item in inputs:
         result.append([item[0], shoot1[int(item[1]) - 1] + 1, shoot2[int(item[2]) - 1] + 1])
     return np.array(result)
-
+#update arrangement with new shoot
 def arrange_shoot(shoot1, shoot1_):
     result = []
     for i in range(len(shoot1_)):
         result.append(shoot1[shoot1_[i]])
     return result
-
+#adjust cubes with given shoot1, shoot2(the arrangement of moving matrix)
 def change_cubes_visit(current_Z, shoot1, shoot2):
     new_current_Z = [move_matrix(current_Z[index, :, :], shoot1, shoot2) for index in range(current_Z.shape[0])]
     return np.array(new_current_Z)
-
-
+#select sampling points with the highest std
 def accusition_sample(model, remaining_point_sets, threshold=50, shape=(34, 35)):
     _, stds = model.predict(remaining_point_sets, return_std=True)
     # stds_final = np.zeros(shape)
@@ -424,8 +423,7 @@ def accusition_sample(model, remaining_point_sets, threshold=50, shape=(34, 35))
     # plt.title("see this expectataions")
     # plt.show()
     return stds, the_choosen_orders
-
-
+# AM method, used to sort rows of the matrix
 def change1(out_final):
     order_count = []
     for i in range(out_final.shape[0]):
@@ -439,7 +437,7 @@ def change1(out_final):
         shoot.append(order_count[i][0])
     letscheck = np.array(letscheck)
     return letscheck, shoot #返回映射
-
+# AM method, used to sort columns of the matrix
 def change2(out_final):
     order_count = []
     for i in range(out_final.shape[1]):
@@ -495,7 +493,7 @@ def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
@@ -549,7 +547,7 @@ def train_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
@@ -888,7 +886,9 @@ def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER
 
     return recordsss
 
+#the diction of different training ways
 train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5:train_MOVE_AM_STD}
+
 
 def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
     recordd = []
@@ -956,7 +956,9 @@ if __name__ == "__main__":
     plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
     plt.plot([j for j in range(len(m5))], m5, "yellow")
     plt.fill_between([j for j in range(len(m5))], m5 - s5, m5 + s5, color='yellow', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs"])
+    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs",
+                "Clustering-per 5 epochs_with_STD", "AM-per 5 epochs_with_STD"])
+    # [{0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5: train_MOVE_AM_STD}]
     plt.xlabel("num-of-epochs")
     plt.ylabel("MSE")
     plt.title("cross-validation")
