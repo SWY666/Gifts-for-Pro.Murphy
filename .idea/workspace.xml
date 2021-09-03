@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="73c0d808-6aba-4610-84b8-b0055c6f9314" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BO3.py" beforeDir="false" afterPath="$PROJECT_DIR$/BO3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Random-forest-4-trial.py" beforeDir="false" afterPath="$PROJECT_DIR$/Random-forest-4-trial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Readme.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,7 +35,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.BO3">
+  <component name="RunManager" selected="Python.Random-forest-4-trial (1)">
     <configuration name="BO3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="homework" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -57,6 +61,9 @@
       <module name="homework" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -71,7 +78,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="RF1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Random-forest-4-trial (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="homework" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -79,11 +86,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop/2020工程文件/北京作业/homework" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/2020工程文件/北京作业/homework/RF1.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Random-forest-4-trial.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -117,6 +124,9 @@
       <module name="homework" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -133,18 +143,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.CV_RF" />
-      <item itemvalue="Python.RF1" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.Random-forest-4-trial" />
       <item itemvalue="Python.BO3" />
+      <item itemvalue="Python.Random-forest-4-trial (1)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Random-forest-4-trial (1)" />
         <item itemvalue="Python.BO3" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.CV_RF" />
         <item itemvalue="Python.Random-forest-4-trial" />
-        <item itemvalue="Python.RF1" />
       </list>
     </recent_temporary>
   </component>
@@ -166,22 +176,22 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="223" y="70" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1630675873386" />
-    <state width="1515" height="147" key="GridCell.Tab.0.bottom" timestamp="1630682581572">
+    <state width="1515" height="125" key="GridCell.Tab.0.bottom" timestamp="1630691675366">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1515" height="147" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1630682581572" />
-    <state width="1515" height="147" key="GridCell.Tab.0.center" timestamp="1630682581572">
+    <state width="1515" height="125" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1630691675366" />
+    <state width="1515" height="125" key="GridCell.Tab.0.center" timestamp="1630691675366">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1515" height="147" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1630682581572" />
-    <state width="1515" height="147" key="GridCell.Tab.0.left" timestamp="1630682581572">
+    <state width="1515" height="125" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1630691675366" />
+    <state width="1515" height="125" key="GridCell.Tab.0.left" timestamp="1630691675366">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1515" height="147" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1630682581572" />
-    <state width="1515" height="147" key="GridCell.Tab.0.right" timestamp="1630682581572">
+    <state width="1515" height="125" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1630691675366" />
+    <state width="1515" height="125" key="GridCell.Tab.0.right" timestamp="1630691675366">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1515" height="147" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1630682581572" />
+    <state width="1515" height="125" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1630691675366" />
     <state x="373" y="38" width="992" height="708" key="SettingsEditor" timestamp="1630377754368">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -190,10 +200,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="498" height="446" key="SwitcherDM/0.0.1536.824@0.0.1536.824" timestamp="1630458899343" />
-    <state x="461" y="240" key="com.intellij.ide.util.TipDialog" timestamp="1630671024289">
+    <state x="461" y="240" key="com.intellij.ide.util.TipDialog" timestamp="1630691433242">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="461" y="240" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1630671024289" />
+    <state x="461" y="240" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1630691433242" />
     <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1630689738880">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

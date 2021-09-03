@@ -258,7 +258,6 @@ class dataset_space_matrix():
             final_Z.append(np.transpose(Z_tmp))
 
         return X, Y, np.array(final_Z), x, y
-#
 #no use
 def classify_curves():
     print("分类曲线")
@@ -911,6 +910,30 @@ def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
     # print(means)
 
     return recordd, means, stdss
+#new sampling points
+def accusition_samplen(model, remaining_point_sets, inputss, threshold=50, shape=(34, 35)):
+    _, stds = model.predict(remaining_point_sets, return_std=True)
+    # stds_final = np.zeros(shape)
+    # for index in range(len(stds)):
+    #     stds_final[int(remaining_point_sets[index][0]), int(remaining_point_sets[index][1])] = stds[index]
+        # expectations_final[int(remaining_point_sets[index][1]) - 1, int(remaining_point_sets[index][0]) - 1] = expectations[index]
+
+    stds_judge = np.c_[stds, [x for x in range(len(remaining_point_sets))], [x for x in remaining_point_sets]].tolist()
+    stds_judge = sorted(stds_judge, key=lambda x: x[0])
+    stds_judge = stds_judge[-threshold:]
+    # print(stds_judge)
+    # the_choosen_ones = [[int(stds_judge[x][1]), int(stds_judge[x][2])] for x in range(len(stds_judge))]
+    the_choosen_orders = [int(stds_judge[x][1]) for x in range(len(stds_judge))]
+    # print(the_choosen_orders)
+    # print(remaining_point_sets[the_choosen_orders[0]])
+    # plt.figure()
+    # plt.contourf(X, Y, stds_final)
+    # plt.title("see this")
+    # plt.figure()
+    # plt.contourf(X, Y, expectations_final)
+    # plt.title("see this expectataions")
+    # plt.show()
+    return stds, the_choosen_orders
 
 if __name__ == "__main__":
     from sklearn.metrics import mean_squared_error, r2_score
@@ -932,7 +955,7 @@ if __name__ == "__main__":
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
     #set epoch times and batch numbers
-    INTER_TIMES = 200
+    INTER_TIMES = 10
     SIFT_NUMBER = 1
     #start training
     r, m, s = train_turn(x,y,Z,0, epcohs=INTER_TIMES)

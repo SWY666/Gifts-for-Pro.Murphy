@@ -483,7 +483,7 @@ if __name__ == "__main__":
     end = 9
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
-    INTER_TIMES = 400
+    INTER_TIMES = 40
     SIFT_NUMBER = 1
 
     # def accusition(model, remaining_point_sets, SIFT_NUMBER=SIFT_NUMBER, shape=(34, 25)):
