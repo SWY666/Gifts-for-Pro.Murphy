@@ -883,10 +883,8 @@ def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
 
     return recordsss
-
 #the diction of different training ways
 train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5:train_MOVE_AM_STD}
-
 #pick one training method and test it for (num=15) times with 200 epochs for each
 #the training method could be check in "type1", the training method could be found in "train_dict" above
 def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
@@ -928,20 +926,22 @@ if __name__ == "__main__":
 
     my_starter = get_ininital_datas_curve_lines()
     datapool = dataset_space_matrix()
+    #select layer
     start = 8
     end = 9
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
+    #set epoch times and batch numbers
     INTER_TIMES = 200
     SIFT_NUMBER = 1
-
+    #start training
     r, m, s = train_turn(x,y,Z,0, epcohs=INTER_TIMES)
     r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
     r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
     r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
     r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
     r5, m5, s5 = train_turn(x, y, Z, 5, epcohs=INTER_TIMES)
-
+    #plot result!
     plt.figure()
     plt.plot([j for j in range(len(m))], m, "red")
     plt.fill_between([j for j in range(len(m))], m - s, m + s, color='red', alpha=0.2)

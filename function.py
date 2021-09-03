@@ -4,6 +4,29 @@ from sklearn.cluster import AffinityPropagation
 import numpy as np
 import matplotlib.pyplot as plt
 
+#transfer method mainly for 9 layer in GR
+def ffff(x):
+    ranges = [(-10, -0.6),(-0.6, 0.3),(-0.3, 0), (0, 0.3), (0.3, 1), (1, 2), (2, 10)]
+    scores = [-40, -10, -3, 3, 10, 25, 40]
+    # scores = [-1, -1, -1, 1, 1, 1, 1]
+    result = 0
+    for i in range(len(ranges)):
+        if ranges[i][0] < x <= ranges[i][1]:
+            result = scores[i]
+
+    return result
+#use ffff on all items in data sets
+def transfor_matrix(Z):
+    if len(Z.shape) == 3:
+        Z = Z[-1, :, :].copy()
+    else:
+        Z = Z[:, :].copy()
+    news = np.zeros(Z.shape)
+    for i in range(Z.shape[0]):
+        for j in range(Z.shape[1]):
+            news[i, j] = ffff(Z[i, j])
+    return news
+#divide matrix into different blocks using recursion method(Clustering)
 def arrange_matrix_ut(datasets, shoot1):
     # print(len(datasets))
     # print(len(shoot1))
@@ -34,6 +57,25 @@ def arrange_matrix_ut(datasets, shoot1):
             tmp.append(j)
         result += tmp
     return result
+#Clustering method
+def change_matrix(matrix_in):
+    if len(matrix_in.shape) == 3:
+        target = matrix_in[-1, :, :].copy()
+    else:
+        target = matrix_in[:, :].copy()
+    target = transfor_matrix(target)
+    dlist = [target[:, i] for i in range(target.shape[1])]
+    shoot1 = [[j, j] for j in range(target.shape[1])]
+    dirs = arrange_matrix_ut(dlist, shoot1)
+    dlist = [d[1] for d in dirs]
+    # dlist = [current_Z[-1, :, :][:, d[1]] for d in dirs]
+
+    dlist_ = [target[i, :] for i in range(target.shape[0])]
+    shoot1 = [[j, j] for j in range(target.shape[0])]
+    dirs = arrange_matrix_ut(dlist_, shoot1)
+    dlist_ = [d[1] for d in dirs]
+
+    return dlist_, dlist
 
 def arrange_matrix_ut_v(datasets, shoot1):
     # print(len(datasets))
@@ -145,47 +187,6 @@ def arrange_matrix_utm(datasets, shoot1):
         result += tmp
     return result
 
-def ffff(x):
-    ranges = [(-10, -0.6),(-0.6, 0.3),(-0.3, 0), (0, 0.3), (0.3, 1), (1, 2), (2, 10)]
-    scores = [-40, -10, -3, 3, 10, 25, 40]
-    # scores = [-1, -1, -1, 1, 1, 1, 1]
-    result = 0
-    for i in range(len(ranges)):
-        if ranges[i][0] < x <= ranges[i][1]:
-            result = scores[i]
-
-    return result
-
-def transfor_matrix(Z):
-    if len(Z.shape) == 3:
-        Z = Z[-1, :, :].copy()
-    else:
-        Z = Z[:, :].copy()
-    news = np.zeros(Z.shape)
-    for i in range(Z.shape[0]):
-        for j in range(Z.shape[1]):
-            news[i, j] = ffff(Z[i, j])
-    return news
-
-def change_matrix(matrix_in):
-    if len(matrix_in.shape) == 3:
-        target = matrix_in[-1, :, :].copy()
-    else:
-        target = matrix_in[:, :].copy()
-    target = transfor_matrix(target)
-    dlist = [target[:, i] for i in range(target.shape[1])]
-    shoot1 = [[j, j] for j in range(target.shape[1])]
-    dirs = arrange_matrix_ut(dlist, shoot1)
-    dlist = [d[1] for d in dirs]
-    # dlist = [current_Z[-1, :, :][:, d[1]] for d in dirs]
-
-    dlist_ = [target[i, :] for i in range(target.shape[0])]
-    shoot1 = [[j, j] for j in range(target.shape[0])]
-    dirs = arrange_matrix_ut(dlist_, shoot1)
-    dlist_ = [d[1] for d in dirs]
-
-    return dlist_, dlist
-
 def change_matrixs(target):
     dlist = [target[:, i] for i in range(target.shape[1])]
     shoot1 = [[j, j] for j in range(target.shape[1])]
@@ -199,7 +200,6 @@ def change_matrixs(target):
     dlist_ = [d[1] for d in dirs]
 
     return dlist_, dlist
-
 
 def histo(matrix_in):
     item_list = matrix_in.flatten().copy()
