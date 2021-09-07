@@ -790,7 +790,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
 
     return recordsss
 
-def train_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
+def train_AM_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     current_Z = Z.copy()
     datas1 = []
     valid_list = []
@@ -827,6 +827,12 @@ def train_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
     # shoot1 = arrange_shoot(shoot1, shoot1_)
     # shoot2 = arrange_shoot(shoot2, shoot2_)
     for times in range(INTER_TIMES):
+        if times % 5 == 0:
+            # shoot1_, shoot2_ = change_matrix(out_final)
+            _, shoot1_, shoot2_ = change_cubes(out_final)
+            shoot1 = arrange_shoot(shoot1, shoot1_)
+            shoot2 = arrange_shoot(shoot2, shoot2_)
+
         if times != 0:
             acq_inputs, _, _ = data_extract(input_space, current_Z)
             stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
@@ -851,15 +857,16 @@ def train_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
 
     return recordsss
 
-train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4:train_STD}
+train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_AM_STD}
 
-def train_turn(xx, yy, ZZ, type1= 0, num=10, epcohs=100):
+def train_turn(xx, yy, ZZ, type1= 0, num=8, epcohs=100):
     recordd = []
     COL = [i for i in range(len(xx))]
     ROW = [i for i in range(len(yy))]
     random.shuffle(COL)
     random.shuffle(ROW)
     for i in range(num):
+        print(f"{i} trial, type{type1}")
         recordd.append(np.array(train_dict[type1](ZZ, COL[i], ROW[i], epcohs)))
 
     sum = np.zeros(epcohs + 1)
@@ -874,7 +881,7 @@ def train_turn(xx, yy, ZZ, type1= 0, num=10, epcohs=100):
         # print(len(recordds[:, i]))
         stdss[i] = np.std(recordds[:, i])
     # print(means)
-
+    print(f"{type1}end")
     return recordd, means, stdss
 
 if __name__ == "__main__":

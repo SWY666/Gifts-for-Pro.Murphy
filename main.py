@@ -908,7 +908,7 @@ def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
         # print(len(recordds[:, i]))
         stdss[i] = np.std(recordds[:, i])
     # print(means)
-
+    print("end")
     return recordd, means, stdss
 #new sampling points
 def accusition_samplen(model, remaining_point_sets, inputss, threshold=50, shape=(34, 35)):
