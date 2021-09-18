@@ -164,6 +164,7 @@ class dataset_space_matrix():
     def return_curve_of_position(self, coordinate):
         GR = self.datapool[coordinate[0], coordinate[1], 2]
         IFD = self.datapool[coordinate[0], coordinate[1], 3]
+        print(GR, "和", IFD)
         Cell_Name = self.Cell_Name_list[coordinate[0]]
         Drug_Name = self.Drug_Name_list[coordinate[1]]
         tmp = datasets[(datasets["Small Molecule Name"] == Drug_Name)]
@@ -171,8 +172,9 @@ class dataset_space_matrix():
         Concentration = [tmp["Small Mol Concentration (uM)"].iloc[i] for i in range(self.range_of_Concentration)]
         return GR, IFD, Concentration
 
+
     def show_curve_of_position(self, index):
-        GR, IFD = self.return_curve_of_position(index)
+        GR, IFD, _ = self.return_curve_of_position(index)
         plt.figure(0)
         plt.plot([x for x in range(len(GR))], GR, "red")
         plt.figure(1)
@@ -886,7 +888,7 @@ def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER
 train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5:train_MOVE_AM_STD}
 #pick one training method and test it for (num=15) times with 200 epochs for each
 #the training method could be check in "type1", the training method could be found in "train_dict" above
-def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=175):
+def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
     recordd = []
     COL = [i for i in range(len(xx))]
     ROW = [i for i in range(len(yy))]
@@ -936,54 +938,5 @@ def accusition_samplen(model, remaining_point_sets, inputss, threshold=50, shape
     return stds, the_choosen_orders
 
 if __name__ == "__main__":
-    from sklearn.metrics import mean_squared_error, r2_score
-    import numpy as np
-    import random
-    import matplotlib.pyplot as plt
-    from sklearn.gaussian_process import GaussianProcessRegressor
-    from sklearn.gaussian_process.kernels import ConstantKernel, RBF
-    from sklearn.ensemble import RandomForestRegressor
-    from function import *
-
-    rbf = ConstantKernel(1.0) * RBF(length_scale=1.0)
-
-    my_starter = get_ininital_datas_curve_lines()
     datapool = dataset_space_matrix()
-    #select layer
-    start = 8
-    end = 9
-    X, Y, Z, x, y= datapool.show_one_layers(start, end)
-    h = [index for index in range(end - start)]
-    #set epoch times and batch numbers
-    INTER_TIMES = 173
-    SIFT_NUMBER = 1
-    #start training
-    r, m, s = train_turn(x,y,Z,0, epcohs=INTER_TIMES)
-    r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
-    r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
-    r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
-    r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
-    r5, m5, s5 = train_turn(x, y, Z, 5, epcohs=INTER_TIMES)
-    #plot result!
-    plt.figure()
-    plt.plot([j for j in range(len(m))], m, "red")
-    plt.fill_between([j for j in range(len(m))], m - s, m + s, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m1))], m1, "blue")
-    plt.fill_between([j for j in range(len(m1))], m1 - s1, m1 + s1, color='blue', alpha=0.2)
-    plt.plot([j for j in range(len(m2))], m2, "orange")
-    plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m3))], m3, "purple")
-    plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='purple', alpha=0.2)
-    plt.plot([j for j in range(len(m4))], m4, "black")
-    plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
-    plt.plot([j for j in range(len(m5))], m5, "yellow")
-    plt.fill_between([j for j in range(len(m5))], m5 - s5, m5 + s5, color='yellow', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs",
-                "Clustering-per 5 epochs_with_STD", "AM-per 5 epochs_with_STD"])
-    # [{0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5: train_MOVE_AM_STD}]
-    plt.xlabel("num-of-epochs")
-    plt.ylabel("MSE")
-    plt.title("cross-validation")
-    plt.show()
-
-
+    datapool.show_curve_of_position((10, 12))

@@ -502,7 +502,7 @@ def train_raw(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 50, SIFT_NUMBER = 1):
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
@@ -556,7 +556,7 @@ def train_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
@@ -658,7 +658,7 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         # if times != 0 and times >= 15:
         #     random.shuffle(input_space)
@@ -666,7 +666,7 @@ def train_MOVE_AM(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 
         #         reg_space.append(input_space.pop(i))
         #     print(times, len(reg_space), len(input_space))
 
-        print(times, len(reg_space), len(input_space))
+        # print(times, len(reg_space), len(input_space))
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
         model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
@@ -769,7 +769,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
             random.shuffle(input_space)
             for i in range(SIFT_NUMBER):
                 reg_space.append(input_space.pop(i))
-            print(times, len(reg_space), len(input_space))
+            # print(times, len(reg_space), len(input_space))
 
         # if times != 0 and times >= 15:
         #     random.shuffle(input_space)
@@ -777,7 +777,7 @@ def train_MOVE_C(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
         #         reg_space.append(input_space.pop(i))
         #     print(times, len(reg_space), len(input_space))
 
-        print(times, len(reg_space), len(input_space))
+        # print(times, len(reg_space), len(input_space))
         inputs, result, _ = data_extract(reg_space, current_Z)
         # model = GaussianProcessRegressor()
         model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
@@ -857,9 +857,76 @@ def train_AM_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1
 
     return recordsss
 
-train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_AM_STD}
+def train_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER = 1):
+    current_Z = Z.copy()
+    datas1 = []
+    valid_list = []
+    input_space = []
+    COL, ROW = ini_COL, ini_ROW
+    for i in range(len(x)):
+        for j in range(len(y)):
+            for ij in range(len(h)):
+                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
+                if i == COL or j == i:
+                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
+                else:
+                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
+    initial_list = valid_list.copy()
+    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
+    reg_space = datas1.copy()  # 扔进去训练的数据
+    # input_spacec = input_space.copy()
+    # reg_spacec = reg_space.copy()
+    # input_space = input_spacec.copy()  # 剩余的数据库
+    # reg_space = reg_spacec.copy()  # 扔进去训练的数据
+    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
+    recordsss = []
+    shoot1 = [i for i in range(len(x))]
+    shoot2 = [i for i in range(len(y))]
+    # model = GaussianProcessRegressor(kernel=rbf)
+    model = RandomForestRegressor(n_estimators=40)
+    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    output = model.predict(valid_list_model)
+    out_final = transmit_final3d(output, valid_list, current_Z)
+    out_record = out_final.copy()
+    recordsss.append(mean_squared_error(out_final.flatten(), current_Z.flatten()))
+    # shoot1_, shoot2_ = change_matrix(out_final2)
+    # _, shoot1_, shoot2_ = change_cubes(current_Z)
+    # shoot1 = arrange_shoot(shoot1, shoot1_)
+    # shoot2 = arrange_shoot(shoot2, shoot2_)
+    for times in range(INTER_TIMES):
+        if times % 5 == 0 and times < 40:
+            shoot1_, shoot2_ = change_matrix(out_final)
+            # _, shoot1_, shoot2_ = change_cubes(out_final)
+            shoot1 = arrange_shoot(shoot1, shoot1_)
+            shoot2 = arrange_shoot(shoot2, shoot2_)
 
-def train_turn(xx, yy, ZZ, type1= 0, num=8, epcohs=100):
+        if times != 0:
+            acq_inputs, _, _ = data_extract(input_space, current_Z)
+            stds, the_choosen_orders = accusition_sample(model, shoot_change_input(acq_inputs, shoot1, shoot2),
+                                                         shape=X.shape,
+                                                         threshold=SIFT_NUMBER)
+
+            the_choosen_orders.sort(reverse=True)
+            # print(len(input_space))
+            add_this_time = []
+            for index in the_choosen_orders:
+                add_this_time.append(input_space.pop(index))
+            reg_space = reg_space + add_this_time
+
+        inputs, result, _ = data_extract(reg_space, current_Z)
+        # model = GaussianProcessRegressor()
+        model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+        # 检查模型的效果#
+        output = model.predict(valid_list_model)
+        out_final = transmit_final3d(output, valid_list, current_Z)
+        recordsss.append(
+            mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
+
+    return recordsss
+
+train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_AM_STD, 5:train_C_STD}
+
+def train_turn(xx, yy, ZZ, type1= 0, num=10, epcohs=100):
     recordd = []
     COL = [i for i in range(len(xx))]
     ROW = [i for i in range(len(yy))]
@@ -902,14 +969,15 @@ if __name__ == "__main__":
     end = 9
     X, Y, Z, x, y= datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
-    INTER_TIMES = 150
+    INTER_TIMES = 175
     SIFT_NUMBER = 1
 
     r, m, s = train_turn(x, y, Z, 0, epcohs=INTER_TIMES)
     r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
     r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
     r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
-    # r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
+    r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
+    r5, m5, s5 = train_turn(x, y, Z, 5, epcohs=INTER_TIMES)
 
     plt.figure()
     plt.plot([j for j in range(len(m))], m, "red")
@@ -920,12 +988,12 @@ if __name__ == "__main__":
     plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='yellow', alpha=0.2)
     plt.plot([j for j in range(len(m3))], m3, "purple")
     plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='red', alpha=0.2)
-    # plt.plot([j for j in range(len(m4))], m4, "black")
-    # plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "max std"])
+    plt.plot([j for j in range(len(m4))], m4, "black")
+    plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
+    plt.plot([j for j in range(len(m5))], m5, "yellow")
+    plt.fill_between([j for j in range(len(m5))], m5 - s5, m5 + s5, color='yellow', alpha=0.2)
+    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs", "AM std", "C std"])
     plt.xlabel("num-of-epochs")
     plt.ylabel("MSE")
     plt.title("cross-validation")
     plt.show()
-
-

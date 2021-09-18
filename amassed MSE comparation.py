@@ -77,7 +77,14 @@ if __name__ == "__main__":
     #########################################################################################################
 
     MSE_disorder = []
+    plt.figure(101)
+    plt.plot(x, Z)
+    plt.savefig("./pic_output/before.svg", format="svg")
     random.shuffle(Z)
+    plt.figure(102)
+    plt.plot(x, Z)
+    plt.savefig("./pic_output/after.svg", format="svg")
+    plt.show()
     for i in range(TOTAL_TIMES):
         Z = np.array(Z)
 
@@ -118,8 +125,8 @@ if __name__ == "__main__":
         MSE_disorder.append(mean_squared_error(output, Z))
 
     plt.figure(3)
-    plt.plot([x for x in range(len(MSE_order))], MSE_order, "red")
-    plt.plot([x for x in range(len(MSE_order))], MSE_disorder, "blue")
+    plt.plot([x for x in range(len(MSE_order))], MSE_order, "r--")
+    plt.plot([x for x in range(len(MSE_order))], MSE_disorder, "b-")
     plt.legend(["MSE of order ones","MSE of disorder ones"])
     plt.xlabel("the turns of trial")
     plt.ylabel("MSE")

@@ -886,7 +886,7 @@ def train_MOVE_C_STD(Z, ini_COL = 2, ini_ROW = 2, INTER_TIMES = 100, SIFT_NUMBER
 train_dict = {0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5:train_MOVE_AM_STD}
 #pick one training method and test it for (num=15) times with 200 epochs for each
 #the training method could be check in "type1", the training method could be found in "train_dict" above
-def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=175):
+def train_turn(xx, yy, ZZ, type1= 0, num=15, epcohs=200):
     recordd = []
     COL = [i for i in range(len(xx))]
     ROW = [i for i in range(len(yy))]
@@ -949,41 +949,94 @@ if __name__ == "__main__":
 
     my_starter = get_ininital_datas_curve_lines()
     datapool = dataset_space_matrix()
-    #select layer
+    # select layer
     start = 8
     end = 9
-    X, Y, Z, x, y= datapool.show_one_layers(start, end)
+    X, Y, Z, x, y = datapool.show_one_layers(start, end)
     h = [index for index in range(end - start)]
-    #set epoch times and batch numbers
-    INTER_TIMES = 173
-    SIFT_NUMBER = 1
-    #start training
-    r, m, s = train_turn(x,y,Z,0, epcohs=INTER_TIMES)
-    r1, m1, s1 = train_turn(x, y, Z, 1, epcohs=INTER_TIMES)
-    r2, m2, s2 = train_turn(x, y, Z, 2, epcohs=INTER_TIMES)
-    r3, m3, s3 = train_turn(x, y, Z, 3, epcohs=INTER_TIMES)
-    r4, m4, s4 = train_turn(x, y, Z, 4, epcohs=INTER_TIMES)
-    r5, m5, s5 = train_turn(x, y, Z, 5, epcohs=INTER_TIMES)
-    #plot result!
-    plt.figure()
-    plt.plot([j for j in range(len(m))], m, "red")
-    plt.fill_between([j for j in range(len(m))], m - s, m + s, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m1))], m1, "blue")
-    plt.fill_between([j for j in range(len(m1))], m1 - s1, m1 + s1, color='blue', alpha=0.2)
-    plt.plot([j for j in range(len(m2))], m2, "orange")
-    plt.fill_between([j for j in range(len(m2))], m2 - s2, m2 + s2, color='red', alpha=0.2)
-    plt.plot([j for j in range(len(m3))], m3, "purple")
-    plt.fill_between([j for j in range(len(m3))], m3 - s3, m3 + s3, color='purple', alpha=0.2)
-    plt.plot([j for j in range(len(m4))], m4, "black")
-    plt.fill_between([j for j in range(len(m4))], m4 - s4, m4 + s4, color='black', alpha=0.2)
-    plt.plot([j for j in range(len(m5))], m5, "yellow")
-    plt.fill_between([j for j in range(len(m5))], m5 - s5, m5 + s5, color='yellow', alpha=0.2)
-    plt.legend(["SC", "AM_RAW", "AM-per-5 epochs", "Clustering-per 5 epochs",
-                "Clustering-per 5 epochs_with_STD", "AM-per 5 epochs_with_STD"])
-    # [{0: train_raw, 1: train_AM, 2: train_MOVE_AM, 3: train_MOVE_C, 4: train_MOVE_C_STD, 5: train_MOVE_AM_STD}]
-    plt.xlabel("num-of-epochs")
-    plt.ylabel("MSE")
-    plt.title("cross-validation")
+
+    current_Z = Z.copy()
+    datas1 = []
+    valid_list = []
+    input_space = []
+    COL, ROW = 2, 2
+    for i in range(len(x)):
+        for j in range(len(y)):
+            for ij in range(len(h)):
+                valid_list.append(([h[ij], x[i], y[j]], [ij, i, j]))
+                if i==COL or j==i:
+                    datas1.append(([h[ij], x[i], y[j]], [ij, i, j]))
+                else:
+                    input_space.append(([h[ij], x[i], y[j]], [ij, i, j]))
+    print(len(datas1))
+    initial_list = valid_list.copy()
+    valid_list_model, _, _ = data_extract(valid_list, current_Z)  # 直接扔进model里面
+    reg_space = datas1.copy()  # 扔进去训练的数据
+    input_spacec = input_space.copy()
+    reg_spacec = reg_space.copy()
+    current_Z = Z.copy()
+    input_space = input_spacec.copy()  # 剩余的数据库
+    reg_space = reg_spacec.copy()  # 扔进去训练的数据
+
+    inputs, result, reg_space_index = data_extract(reg_space, current_Z)
+    record2 = []
+    shoot1 = [i for i in range(len(x))]
+    shoot2 = [i for i in range(len(y))]
+
+    # random.shuffle(input_space)
+    # for i in range(70):
+    #     reg_space.append(input_space.pop(i))
+    # print(times, len(reg_space), len(input_space))
+
+    # model = GaussianProcessRegressor(kernel=rbf)
+    model = RandomForestRegressor(n_estimators=40)
+    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    output = model.predict(valid_list_model)
+    out_final = transmit_final3d(output, valid_list, current_Z)
+
+    Font_size=12
+    plt.rcParams.update({"font.size": Font_size})
+    fig0 = plt.figure(1)
+    ax = plt.axes(projection='3d')
+    ax.contour3D(X, Y, np.transpose(current_Z[-1, :, :]), 150, cmap='binary')
+    print(mean_squared_error(out_final[-1, :, :], current_Z[-1, :, :]))
+    ax.set_xlabel('cell_order_list')
+    ax.set_ylabel('small_molecule_order_list')
+    histo(abs(out_final[-1, :, :] - current_Z[-1, :, :]))
+    # plt.colorbar()
+    # shoot1_, shoot2_ = change_matrix(out_final)
+    _, shoot1_, shoot2_ = change_cubes(out_final)
+    shoot1 = arrange_shoot(shoot1, shoot1_)
+    shoot2 = arrange_shoot(shoot2, shoot2_)
+    model.fit(shoot_change_input(inputs, shoot1, shoot2), result)
+    output = model.predict(valid_list_model)
+    out_final = transmit_final3d(output, valid_list, current_Z)
+    fig1 = plt.figure(2)
+    ax = plt.axes(projection='3d')
+    ax.contour3D(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]), 150, cmap='binary')
+    ax.set_xlabel('cell_order_list')
+    ax.set_ylabel('small_molecule_order_list')
+    # ax.contour3D(X, Y, np.transpose(out_final[-1, :, :]-change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]), 150, cmap='binary')
+    print(mean_squared_error(out_final[-1, :, :], change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+    # histo(abs(out_final[-1, :, :]-change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]))
+    # ax.contour3D(X, Y, np.transpose(change_cubes_visit(current_Z, shoot1, shoot2)[-1, :, :]), 150, cmap='binary')
+    # ax.set_xlabel('cell_order_list')
+    # ax.set_ylabel('small_molecule_order_list')
     plt.show()
-
-
+    # fig = plt.figure(2)
+    # ax = plt.axes(projection='3d')
+    # ax.contour3D(X, Y, np.transpose(change_cubes_visit(out_final, shoot1, [i for i in range(len(y))])[-1, :, :]), 150, cmap='binary')
+    # # plt.rcParams.update({"font.size": Font_size})
+    # ax.set_xlabel('cell_order_list')
+    # ax.set_ylabel('small_molecule_order_list')
+    # # plt.contourf(X, Y, np.transpose(change_cubes_visit(out_final, shoot1, [i for i in range(len(y))])[-1, :, :]))
+    # # plt.scatter([item[1] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    # #             [item[2] for item in shoot_change_input(inputs, shoot1, shoot2)],
+    # #             c="red", marker="x")
+    # fig2 = plt.figure(3)
+    # ax = plt.axes(projection='3d')
+    # ax.contour3D(X, Y, np.transpose(change_cubes_visit(out_final, shoot1, shoot2)[-1, :, :]), 150, cmap='binary')
+    # # plt.rcParams.update({"font.size": Font_size})
+    # ax.set_xlabel('cell_order_list')
+    # ax.set_ylabel('small_molecule_order_list')
+    # plt.show()

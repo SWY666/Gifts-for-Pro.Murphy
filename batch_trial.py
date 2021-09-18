@@ -603,7 +603,7 @@ if __name__ == "__main__":
     #     #     plt.show()
 
     INTER_TIMES = 50
-    SIFT_NUMBER = 1
+    SIFT_NUMBER = 8
     x5 =[0]
     current_Z = Z.copy()
     input_space = input_spacec.copy()  # 剩余的数据库
@@ -669,7 +669,30 @@ if __name__ == "__main__":
         output = model.predict(valid_list_model)
         output2 = model2.predict(valid_list_model)
         out_final = transmit_final3d(output, valid_list, current_Z)
-        out_final2 = transmit_final3d(output, valid_list, current_Z)
+        out_final2 = transmit_final3d(output2, valid_list, current_Z)
+        #####################
+        #画图#
+        plt.figure(151)
+
+        plt.contourf(X, Y, np.transpose(out_final[-1, :, :]), cmap=plt.get_cmap("binary"))
+        plt.title("yee")
+        # sns.heatmap(stds_final, annot=True)
+        # displays = shoot_change_input(inputs, shoot1, shoot2)
+        plt.colorbar()
+        plt.scatter([item[1] for item in inputs],
+                    [item[2] for item in inputs],
+                    c="red", marker="x")
+        plt.figure(152)
+
+        plt.contourf(X, Y, np.transpose(out_final2[-1, :, :]), cmap=plt.get_cmap("binary"))
+        plt.title("yee2")
+        plt.colorbar()
+        plt.scatter([item[1] for item in inputs],
+                    [item[2] for item in inputs],
+                    c="red", marker="x")
+        plt.show()
+
+        #####################
         x5.append((times + 1) * SIFT_NUMBER)
         record5.append(
             mean_squared_error(out_final.flatten(), change_cubes_visit(current_Z, shoot1, shoot2).flatten()))
@@ -826,7 +849,7 @@ if __name__ == "__main__":
     # plt.plot([x for x in range(len(record))], record, "green")
     # plt.plot([x for x in range(len(record1))], record1, "red")
     # plt.plot([x for x in range(len(record2))], record2, "orange")
-    plt.plot(x3, record3, "purple")
+    # plt.plot(x3, record3, "purple")
     plt.plot(x5, record5, "blue")
     plt.ylabel("MSE")
     plt.xlabel("epoches")

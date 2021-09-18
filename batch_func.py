@@ -56,23 +56,23 @@ def accusition_sampleb(model, remaining_point_sets, threshold=50, shape=(34, 35)
     the_choosen_orders = [int(stds_judge[x][1]) for x in range(len(stds_judge))]
     # print(the_choosen_orders)
     # print(remaining_point_sets[the_choosen_orders[0]])
-    plt.figure(151)
-
-    plt.contourf(X, Y, stds_final)
-    plt.title("see this")
-    # sns.heatmap(stds_final, annot=True)
-    plt.colorbar()
-    plt.scatter([int(remaining_point_sets[item][1]) for item in the_choosen_orders],
-                [int(remaining_point_sets[item][2]) for item in the_choosen_orders],
-                c="red", marker="x")
-    plt.figure(152)
-
-    plt.contourf(X, Y, expp_final)
-    plt.title("std matrix")
-    # sns.heatmap(stds_final, annot=True)
+    # plt.figure(151)
+    #
+    # plt.contourf(X, Y, stds_final)
+    # plt.title("see this")
+    # # sns.heatmap(stds_final, annot=True)
     # plt.colorbar()
-    plt.scatter([int(remaining_point_sets[item][1]) for item in the_choosen_orders],
-                [int(remaining_point_sets[item][2]) for item in the_choosen_orders],
-                c="red", marker="x")
-    plt.show()
+    # plt.scatter([int(remaining_point_sets[item][1]) for item in the_choosen_orders],
+    #             [int(remaining_point_sets[item][2]) for item in the_choosen_orders],
+    #             c="red", marker="x")
+    # plt.figure(152)
+    #
+    # plt.contourf(X, Y, expp_final)
+    # plt.title("std matrix")
+    # # sns.heatmap(stds_final, annot=True)
+    # # plt.colorbar()
+    # plt.scatter([int(remaining_point_sets[item][1]) for item in the_choosen_orders],
+    #             [int(remaining_point_sets[item][2]) for item in the_choosen_orders],
+    #             c="red", marker="x")
+    # plt.show()
     return stds, the_choosen_orders

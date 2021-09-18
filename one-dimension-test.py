@@ -63,11 +63,14 @@ if __name__ == "__main__":
     # plt.plot(x, output, "blue", label='yaht')
     # plt.scatter(inputs, result)
     plt.title("sorted 1D function")
+    # plt.savefig(f'./pic_output/layer{9}.eps', dpi=600, format='eps')
+
+    plt.savefig(f'./pic_output/layer{9}.svg', format="svg")
     plt.show()
     # fig = plt.figure()
-    # ##
-    #
-    # ##
+    ##
+
+    ##
     # ax = plt.axes(projection='3d')
     # ax.contour3D(X, Y, out_new, 50)
     # ax.contour3D(X, Y, Z, 50)
