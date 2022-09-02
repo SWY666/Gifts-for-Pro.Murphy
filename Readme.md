@@ -3,15 +3,15 @@ Code as souvenior as summer camp in Carnegie Mellon University online.
 Published as my first conference paper: "A recessive active learning method: enhancing the performance of predict models by adjusting the structure of data space", Proc. SPIE 12087, International Conference on Electronic Information Engineering and Computer Technology (EIECT 2021), 120871W (13 December 2021).
 
 <div align="center">
-  <img width="100%" alt="BYHE illustration" src=".github/adjustment.png">
+  <img width="80%" alt="BYHE illustration" src=".github/adjustment.png">
 </div>
 
 <div align="center">
-  <img width="100%" alt="BYHE illustration" src=".github/cross_validation.png">
+  <img width="50%" alt="BYHE illustration" src=".github/cross_validation.png">
 </div>
 
 <div align="center">
-  <img width="100%" alt="BYHE illustration" src=".github/cross_validation1.png">
+  <img width="50%" alt="BYHE illustration" src=".github/cross_validation2.png">
 </div>
 
 
