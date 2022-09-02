@@ -1,5 +1,7 @@
 # Introduction of the project
 Code as souvenior as summer camp in Carnegie Mellon University online.
+
+## Effect Exhibition
 Published as my first conference paper: "A recessive active learning method: enhancing the performance of predict models by adjusting the structure of data space", Proc. SPIE 12087, International Conference on Electronic Information Engineering and Computer Technology (EIECT 2021), 120871W (13 December 2021).
 
 <div align="center">
@@ -35,7 +37,7 @@ This py documment serves as cross-validation on random-forest regressor, the run
 6. one-dimension-test.py
 This file exhibits the effect of my methodology on simple 1-D situations.
 
-7.the rest document are some middle file which are used to check the process and the effect of code when I am training model.
+7. the rest document are some middle file which are used to check the process and the effect of code when I am training model.
 
 8. datasets
 The file contains the datasets of this trial, ".\datasets\LDS-1518\Data\20343.csv".
